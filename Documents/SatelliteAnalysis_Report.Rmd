@@ -1,0 +1,271 @@
+---
+title: "Wirral and Liverpool Antidepressant Prescribing Jan 2018 to Feb 2021"
+author: 
+  - Simon Chambers, Wirral Intelligence Service
+  - Roberta Piroddi, Liverpool University
+  - Lauren Barnet, Liverpool University
+  - Matt Gilmore, NHS Wirral CCG
+subtitle: Health Foundation Local Satellite Analysis
+output:
+  officedown::rdocx_document: 
+    reference_docx: template.docx
+    plots:
+        align: center
+abstract: | 
+    The 2020 COVID19 pandemic required non trivial numbers of the population in the UK to self isolate as part of the Shielding programme.  The impacts on mental health for these persons as well as the wider populace are hard to quantify, however it is possible that this is expressed through an increase in the rate of anti-depressant prescriptions.  
+    
+    This report represents the outcomes of an exploratory analysis to try to understand whether the prescribing data in the Liverpool City Region and the Wirral supports this hypothesis and whether there have been changes in prescribing habits when compared with the time immediately prior to the onset of the pandemic.
+---
+
+```{r setup, include=FALSE}
+require(dplyr)
+require(tidyr)
+require(ggplot2)
+require(lubridate)
+require(openxlsx)
+require(knitr)
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE,fig.height = 4.25,fig.width = 6.25,dpi = 192)
+
+load('../Data/03_1_SummaryStats.rda')
+load('../Data/Wirral/population_summary.rda')
+```
+
+\newpage
+
+# Overview
+
+The ongoing mental health of vulnerable populations within the Liverpool City Region and Wirral is an area of concern and the objective of this report is to investigate whether there is any evidence of a change in this since the COVID19 pandemic struck.  To do this the rate of prescribing of anti-depressants as recorded by the primary care systems is used as a proxy to see if there has been a step change in the rate of prescription in the pre- and post- COVID periods.  Data was taken from January 2018 through to the end of February 2021 (the latest complete month available) and stratified through vulnerable populations to see if any changes are identifiable.
+
+This approach does have limitations in the assumption that anti-depressant prescriptions are an appropriate proxy for changes in mental health. Furthermore, our search for anti-depressant prescriptions  excluded alternatives for dealing with some mental health such as Beta Blockers as these are also prescribed for other conditions outside of this area. These medications were not included because it is difficult to narrow the reason for prescription to mental health / non-mental health reasons from within the prescribing data and a broader textual analysis of the patient records beyond the scope of this project would have been required.
+
+This report presents a simple investigation into the rate of persons being prescribed anti-depressants and does not look into whether the types and doses of prescriptions have changed in addition to the rates per capita.
+
+Keeping this in mind the objective of the analysis is to obtain insights into whether there has been a change in the number of people using anti-depressants and to understand whether this is a response to the pandemic or as a result of longer term trends.
+
+# Method
+
+Prescription data for anti-depressants was extracted from the EMIS systems of both Wirral and Liverpool CCGs from January 2018 through February 2021 covering both the pre- and post-COVID pandemic periods.  Both systems used an identical set of extract criteria, although for Liverpool CCG it was not possible to extract data for nine GP Practices (accounting for 9% of the population in Liverpool) so these have been excluded entirely.
+
+The data was adjusted to look at individuals rather than prescriptions so for each person in the data it was determined whether that person had a prescription in each given month and this was then used to calculate the overall per capita prescription rate for each month. The rate per-10,000 persons in each group was calculated using demographic information available for each area - for Wirral the total number of persons registered with a GP currently and is 335,583 and for Liverpool it is 553,988 as of March 2021.
+
+Sub-stratification for these was by gender, IMD2019 quintile, current age-band (Under 20s, Over 80s and 10yr age bands in between), Shielding/CEV (Clinically Extremely Vulnerable) status and ethnicity although it is worth keeping in mind that ethnicity coding across Wirral and Liverpool the rate of missingness of ethnicity information is 20% of the registered population and we do not have in place procedures to verify the correctness of the coding in place.
+
+
+# Results
+
+## Liverpool
+
+Overall, the monthly rate of anti-depressant prescriptions appeared to increase over the time period.
+
+![Prescriptions per 10,000 persons, Liverpool, Jan 2018-Feb2021](Liverpool_Images/overall_prescribing_rate.png){width=100%}
+
+Females had a higher prescription rate than males throughout the time period.
+
+![Prescriptions per 10,000 Males, Females, Liverpool, Jan 2018-Feb2021](Liverpool_Images/gender_prescribing_rate.png){width=100%}
+
+Patients between the ages of 50 and 59 years had the highest prescription rate at each time point, followed by patients aged 40-49 years. The age group with the lowest prescription rate were 0-19 years old, followed by those aged 80 years and older.
+
+![Prescriptions per 10,000 persons by age, Liverpool, Jan 2018-Feb2021](Liverpool_Images/age_prescribing_rate.png){width=100%}
+
+White patients had the highest prescription rate, whilst patients from ethnic minorities had the lowest.
+
+![Prescriptions per 10,000 persons by ethnicity, Liverpool, Jan 2018-Feb2021](Liverpool_Images/ethnic_prescribing_rate.png){width=100%}
+
+Of the ethnic minorities, patients from other ethnic groups had the highest prescription rate. Patients from Mixed/multiple ethnic groups had the lowest prescription rate.
+
+![Prescriptions per 10,000 persons by ethnicity, all non-White, Liverpool, Jan 2018-Feb2021](Liverpool_Images/no_white_ethnic_prescribing_rate.png){width=100%}
+
+Patients living in the most deprived areas of Liverpool had the highest rate of anti-depressant prescriptions, whilst those in the least deprived had the lowest.
+
+![Prescriptions per 10,000 persons by deprivation quintile (IMD2019), Liverpool, Jan 2018-Feb2021](Liverpool_Images/deprivation_prescribing.png){width=100%}
+
+After stratification by shielded status, patients who did shield had much higher rates of anti-depressant prescriptions than those who did not.
+
+![Prescriptions per 10,000 persons by shielding status, Liverpool, Jan 2018-Feb2021](Liverpool_Images/shielding_status_prescribing_rate.png){width=100%}
+
+Stratifying the average monthly number of anti-depressant prescriptions by gender, and COVID period found that both groups had a higher number of anti-depressants during the pandemic period.
+
+![Mean monthly prescriptions, pre/post April 1st 2020, Males & Females, Liverpool, Jan 2018-Feb2021](Liverpool_Images/gender_prepost.png){width=100%}
+
+After stratification by age group, the average number of anti-depressants was higher in the post-COVID period for all age bands.
+
+![Mean monthly prescriptions, pre/post April 1st 2020 by Age, Liverpool, Jan 2018-Feb2021](Liverpool_Images/age_prepost.png){width=100%}
+
+Stratification by IMD 2019 quintile showed that the most deprived areas had an increase in monthly average anti-depressant prescriptions during the COVID-19 pandemic, similarly to all other deprivation quintiles.
+
+![Mean monthly prescriptions, pre/post April 1st 2020 by deprivation quintile (IMD2019), Liverpool, Jan 2018-Feb2021](Liverpool_Images/imd_prepost.png){width=100%}
+
+## Wirral
+
+Looking at the rate of prescriptions for all persons in Wirral we see that there is a similar trend to that of the Liverpool area with overall prescriptions rising over time with no immediately obvious step change at the point at which the pandemic started or thereafter.  Wirral overall has a higher rate of prescriptions per capita than does Liverpool with a peak of 741 persons per 10,000 population in December 2020.
+
+
+```{r,fig.cap='Prescriptions per 10,000 persons, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>%
+    group_by(month_start) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    left_join(demographics_summary %>% summarise(pop=sum(n)),by=character()) %>%
+    mutate(rate=n/pop * 10000) %>%
+    ggplot(aes(x=month_start,y=rate)) + geom_point() + ylim(0,1000) + 
+    scale_x_date(NULL,date_labels= "%b %y",date_breaks="3 months") + 
+    theme(axis.text.x=element_text(angle=45,vjust=0.5,hjust=0.25)) + 
+    ylim(0,NA) +
+    ylab('Rate per 10,000 population') + 
+    xlab('Month')
+    
+```
+
+As with the Liverpool data the rate of prescriptions in Females is much greater than that for Males and the rate of increase over time appears to be greater also.
+
+```{r,fig.cap='Prescriptions per 10,000 Males, Females, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>%
+    group_by(month_start,gender) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    left_join(demographics_summary %>% group_by(gender) %>% summarise(pop=sum(n)),by="gender") %>%
+    mutate(rate=n/pop * 10000) %>%
+    filter(gender %in% c("Male","Female")) %>%
+    ggplot(aes(x=month_start,y=rate,colour=gender)) + geom_point() + 
+    scale_x_date(NULL,date_labels= "%b %y",date_breaks="3 months") + 
+    theme(axis.text.x=element_text(angle=45,vjust=0.5,hjust=0.25),legend.position = "bottom",legend.title = element_blank()) + 
+    ylim(0,NA) +
+    ylab('Rate per 10,000 population') + 
+    xlab('Month')
+```
+
+When comparing the rates of prescription by age we find that for Wirral under 20s have the lowest rate and those in the 40-59 age range have the lowest rate per capita of prescriptions.  Interestingly Wirral had much higher rates of anti-depressant prescriptions for those aged under 20 than Liverpool.
+
+
+```{r,fig.cap='Prescriptions per 10,000 persons by age, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>%
+    group_by(month_start,age_band) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    left_join(demographics_summary %>% group_by(age_band) %>% summarise(pop=sum(n)),by="age_band") %>%
+    mutate(rate=n/pop * 10000) %>%
+    ggplot(aes(x=month_start,y=rate,colour=age_band)) + geom_point() + 
+    scale_x_date(NULL,date_labels= "%b %y",date_breaks="3 months") + 
+    theme(axis.text.x=element_text(angle=45,vjust=0.5,hjust=0.25),legend.position = "bottom",legend.title = element_blank()) + 
+    ylim(0,NA) +
+    ylab('Rate per 10,000 population') + 
+    xlab('Month')
+```
+
+As with the data in Liverpool prescription rates for areas of deprivation were effectively sorted by their IMD2019 quintile - with all areas rising over time.  All areas showed a rise in the rate of prescriptions over time however the increase for the areas of lowest deprivation was rising slightly faster than that of the highest deprivation over the time period having a 62% rise compared to 40%.
+
+
+```{r,fig.cap='Prescriptions per 10,000 persons by deprivation quintile (IMD2019), Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>%
+    group_by(month_start,imd_quintile) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    left_join(demographics_summary %>% group_by(imd_quintile) %>% summarise(pop=sum(n)),by="imd_quintile") %>%
+    mutate(rate=n/pop * 10000) %>%
+    filter(!is.na(imd_quintile)) %>%
+    ggplot(aes(x=month_start,y=rate,colour=imd_quintile)) + geom_point() + 
+    scale_x_date(NULL,date_labels= "%b %y",date_breaks="3 months") + 
+    theme(axis.text.x=element_text(angle=45,vjust=0.5,hjust=0.25),legend.position = "bottom",legend.title = element_blank()) + 
+    ylim(0,NA) +
+    ylab('Rate per 10,000 population') + 
+    xlab('Month') + 
+    guides(colour = guide_legend(nrow = 2))
+```
+
+Clinically vulnerable persons had higher rates of anti-depressant prescriptions than those who were not classified as such.
+
+
+```{r,fig.cap='Prescriptions per 10,000 persons by shielding status, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>%
+    group_by(month_start,CEV) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    left_join(demographics_summary %>% group_by(CEV) %>% summarise(pop=sum(n)),by="CEV") %>%
+    mutate(rate=n/pop * 10000) %>%
+    ggplot(aes(x=month_start,y=rate,colour=CEV)) + geom_point() + 
+    scale_x_date(NULL,date_labels= "%b %y",date_breaks="3 months") + 
+    theme(axis.text.x=element_text(angle=45,vjust=0.5,hjust=0.25),legend.position = "bottom") + 
+    ylim(0,NA) +
+    ylab('Rate per 10,000 population') + 
+    xlab('Month') + 
+    guides(colour = guide_legend(title="Shielding"))
+```
+
+
+### Pre-Post covid differences
+
+Comparing the pre- and post- COVID19 periods by looking at the average number of prescriptions for anti-depressants for Males and Females there is a difference which is more pronounced for Females than for Males.
+
+```{r,fig.cap='Mean monthly prescriptions, pre/post April 1st 2020, Males & Females, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>% 
+    filter(gender != "Not specified") %>%
+    group_by(month_start,pre_covid,gender) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    group_by(pre_covid,gender) %>% 
+    summarise(c=n(),avg_monthly=mean(n),sd_monthly = sd(n)) %>%
+    mutate(se_monthly=sd_monthly/sqrt(c)) %>%
+    ggplot(aes(x=gender,fill=pre_covid,y=avg_monthly)) + geom_bar(stat="identity",position="dodge") + 
+    geom_errorbar(aes(ymin=avg_monthly-(1.96*se_monthly),ymax=avg_monthly+(1.96*se_monthly)),position=position_dodge(0.9),width=0.1) + 
+    theme(legend.position = "bottom",legend.title = element_blank()) + 
+    xlab('Gender') + 
+    ylab('Mean Monthly Prescriptions') +
+    scale_fill_manual(values=c("#F8766D","#00BFC4"))
+
+```
+
+Following the pattern from Liverpool when stratifying by age band the number of anti-depressants was higher for all ages in the post-COVID period than pre- with the differences being consistent and the 40-49 and 50-59 age bands having the largest uplift.
+
+```{r,fig.cap='Mean monthly prescriptions, pre/post April 1st 2020 by Age, Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>% 
+    #filter(gender != "Not specified") %>%
+    group_by(month_start,pre_covid,age_band) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    group_by(pre_covid,age_band) %>% 
+    summarise(c=n(),avg_monthly=mean(n),sd_monthly = sd(n)) %>%
+    mutate(se_monthly=sd_monthly/sqrt(c)) %>%
+    ggplot(aes(x=age_band,fill=pre_covid,y=avg_monthly)) + geom_bar(stat="identity",position="dodge") + 
+    geom_errorbar(aes(ymin=avg_monthly-(1.96*se_monthly),ymax=avg_monthly+(1.96*se_monthly)),position=position_dodge(0.9),width=0.1) + 
+    theme(legend.position = "bottom",legend.title = element_blank()) +
+    xlab('Age') + 
+    ylab('Mean Monthly Prescriptions') +
+    scale_fill_manual(values=c("#F8766D","#00BFC4"))
+
+```
+
+Deprivation is a strong indicator of whether someone is likely to be in receipt of a anti-depressant prescription and across all deprivation quintiles there is a significant uplift when comparing the pre- and post-COVID19 periods.
+
+```{r,fig.cap='Mean monthly prescriptions, pre/post April 1st 2020 by deprivation quintile (IMD2019), Wirral, Jan 2018-Feb2021'}
+  monthly_summary %>% 
+    filter(!is.na(imd_quintile)) %>%
+    group_by(month_start,pre_covid,imd_quintile) %>% 
+    summarise(n=sum(number_persons_prescribed)) %>%
+    group_by(pre_covid,imd_quintile) %>% 
+    summarise(c=n(),avg_monthly=mean(n),sd_monthly = sd(n)) %>%
+    mutate(se_monthly=sd_monthly/sqrt(c)) %>%
+    ggplot(aes(x=imd_quintile,fill=pre_covid,y=avg_monthly)) + geom_bar(stat="identity",position="dodge") + 
+    geom_errorbar(aes(ymin=avg_monthly-(1.96*se_monthly),ymax=avg_monthly+(1.96*se_monthly)),position=position_dodge(0.9),width=0.1) + 
+    theme(legend.position = "bottom",legend.title = element_blank()) +  
+    xlab('Deprivation') + 
+    ylab('Mean Monthly Prescriptions') + 
+    scale_fill_manual(values=c("#F8766D","#00BFC4"))
+
+```
+
+
+# Discussion
+
+The results for both Liverpool and Wirral show an increasing rate at which people are using anti-depressants since the COVID19 pandemic hit in the early part of last year.  Trend data shows that whilst the post-COVID period does have an increase this does follow a longer term trend in which prescribing rates are rising over time.  The data primarily looks at the number of people for whom a prescription has been made and doesn't at this point look at whether or not there has been an increase in the strength of doses being prescribed or any escalation to stronger anti-depressants since the COVID related lockdown. periods started.
+
+Overall there seems to be very little effect of the pandemic on the long term trend in anti-depressant prescribing.
+
+However, looking at separate age bands, it seems to exists a noticeable a drop in some age bands in April May 2020 - subsequently picking up again.  This seems to indicate that people in the age bracket 40-49 year olds / 50-59 yr olds (and possibly greater in more deprived areas) are the ones where this pattern emerges. This might reflect some unmet need at the beginning of the pandemic. 
+
+Much of the data show already well-known trends: antidepressant prescribing has been increasing linearly for several years  - higher rates are observed in women. Peaking in working age, it declines in older ages,  and it is higher in more deprived areas.  The social / demographic patterns are consistent with what we know about depression prevalence. 
+
+Shielded population are prescribed a lot more antidepressants consistently in Wirral and Liverpool. This is a bit surprising - as the shielded population are generally quite old. Older people are generally less likely to be prescribed with antidepressants. However, this is also a population with high co-morbidity - which increases risk.  
+
+The differences in deprivation are interesting: there is a much steeper gradient in Wirral. This needs to be further research, because it may depend on the different quintile distributions, 
+In both Wirral and Liverpool - inequalities widen - i.e gap between deprived / less deprived get bigger - but no evidence the pandemic has made that worse. This seems a trend nationally since 2010^[Barr, Ben, Peter Kinderman, and Margaret Whitehead. "Trends in mental health inequalities in England during a period of recession, austerity and welfare reform 2004 to 2013." Social Science & Medicine 147 (2015): 324-331.]
+
+
+The results suggest that further work is needed in a couple of areas. There is a need to identify whether any of the uplift here has been driven by an increase in new prescriptions being made or whether people who might under more normal circumstances stopped making use of these drugs are continuing to take them. The second question which needs answering is whether there has been an increase in the strength of the prescriptions being made in the post-COVID period compared with historical data and whether people are swapping to a stronger set of pharmaceuticals at a greater rate or not.
+
+Additionally, this preliminary analysis will need to be repeated with age adjustment. It is suspected that with it, the differences observed would then be even greater. 
+
+The pre and post covid comparisons need to take into account the long term trend - as what we are observing might most likely be just reflecting the normal yearly increase, and have so nothing to do with COVID.  So to get more information further analysis need to concentrate on whether some groups have deviated from that trend and by how much. 
+
