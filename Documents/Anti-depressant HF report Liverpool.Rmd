@@ -1,0 +1,208 @@
+---
+title: "Anti-depressant prescriptions"
+author: "L.Barnett"
+date: "25/03/2021"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+# Trend of anti-depressant prescriptions in the Liverpool population
+
+
+## Methods
+Using data from Liverpool CCG we modelled the monthly rate of anti-depressant prescriptions in the Liverpool population from January 2018 to February 2021, covering the pre and post-COVID pandemic time periods.
+The monthly prescription rate was calculated overall by identifying how many patients had received one or more prescriptions of anti-depressants per month, and dividing by the total number of patients who were alive and contributing data in the same month. To get the rate in person-months, the crude rate was multiplied by 10,000.  
+The crude rate was then stratified by; age in the time period(categorised into 10-year increments); gender; ethnicity; local IMD 2019 quintile; and shielded status.  
+In order to investigate the associations between patient demographics and prescription rate of anti-depressants, logistic regression was fitted to the data.  
+
+
+
+## Results  
+Overall, the monthly rate of anti-depressant prescriptions appeared to increase over the time period.
+
+
+```{r pressure, echo=FALSE, message = FALSE}
+library(ggplot2)
+library(readxl)
+library(dplyr)
+load("final analysis data.RData")
+analysis %>%
+  group_by(timestamp) %>%
+  summarise(n = sum(antidep)) %>%
+  mutate(prev = (n/494546)*10000) %>%
+  mutate(timestamp = as.character(timestamp)) %>%
+  ggplot(aes(x = timestamp, y = prev)) +
+  geom_point(size = 2) +
+  labs(x = "Year/month", y = "Prescrption rate per 10,000 P-M") +
+  ylim(0, 700) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+ 
+Females had a higher prescription rate than males throughout the time period.  
+
+
+```{r, echo = FALSE}
+denom.gend <- analysis %>%
+  distinct(linkpseudo, .keep_all = TRUE) %>%
+  group_by(gender.y) %>%
+  count()
+analysis %>%
+  group_by(timestamp, gender.y) %>%
+  summarise(num = sum(antidep)) %>%
+  left_join(denom.gend, by = "gender.y") %>%
+  mutate(prev = (num/n)*10000) %>%
+  filter(gender.y %in% c("Male", "Female")) %>%
+  mutate(timestamp = as.character(timestamp)) %>%
+  ggplot(aes(x = timestamp, y = prev,
+                   color = gender.y)) +
+  geom_point(size = 2) +
+  labs(x = "Year/month", y = "Prescrption rate per 10,000 P-M") +
+  ylim(0, 1000) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+Patients between the ages of 50 and 59 years had the highest prescription rate at each time point, followed by patients aged 40-49 years. The age group with the lowest prescription rate were 0-19 years old, followed by those aged 70 years and older.
+
+
+``` {r, echo = FALSE}
+denom.age <- analysis %>%
+  distinct(linkpseudo, .keep_all = TRUE) %>%
+  group_by(age.group.time) %>%
+  count()
+analysis %>%
+  group_by(timestamp, age.group.time) %>%
+  summarise(num = sum(antidep)) %>%
+  left_join(denom.age, by = "age.group.time") %>%
+  mutate(prev = (num/n)*10000) %>%
+  mutate(timestamp = as.character(timestamp)) %>%
+  ggplot(aes(x = timestamp, y = prev,
+             color = age.group.time)) +
+  geom_point(size = 2) +
+  labs(x = "Year/month", y = "Prescrption rate per 10,000 P-M") +
+  ylim(0, 1200) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+Patients living in the most deprived(?) areas of Liverpool had the highest rate of anti-depressant prescriptions, whilst those in the least deprived had the lowest.
+
+
+``` {r, echo=FALSE}
+denom.dep <- analysis %>%
+  distinct(linkpseudo, .keep_all = TRUE) %>%
+  group_by(local_imd_quintile.y) %>%
+  count()
+analysis %>%
+  group_by(timestamp, local_imd_quintile.y) %>%
+  summarise(num = sum(antidep)) %>%
+  left_join(denom.dep, by = "local_imd_quintile.y") %>%
+  mutate(prev = (num/n)*10000) %>%
+  mutate(timestamp = as.character(timestamp)) %>%
+  ggplot(aes(x = timestamp, y = prev,
+             color = local_imd_quintile.y)) +
+  geom_point(size = 2) +
+  labs(x = "Year/month", y = "Prescrption rate per 10,000 P-M") +
+  ylim(0, 1000) +
+  theme(axis.text.x = element_text(angle = 90))+
+  scale_color_discrete(labels = c("Most deprived", "2", "3", "4", 
+                                  "Least deprived", "missing"))
+
+```
+
+
+After stratification by CEV status, patients who did not shield had higher rates of anti-depressant prescriptions than those who did shield.
+
+
+``` {r, echo = FALSE}
+denom.shield <- analysis %>%
+  distinct(linkpseudo, .keep_all = TRUE) %>%
+  group_by(shielded) %>%
+  count()
+analysis %>%
+    group_by(timestamp, shielded) %>%
+  summarise(n = sum(antidep)) %>%
+  left_join(denom.shield, by = "shielded") %>%
+  mutate(prev = (n.x/n.y)*10000) %>%
+  mutate(timestamp = as.character(timestamp)) %>%
+  mutate(shielded = factor(shielded, levels = c(0, 1), 
+                           labels = c("No", "Yes"))) %>%
+  ggplot(aes(x = timestamp, y = prev, color = shielded)) +
+  geom_point(size = 2) +
+  labs(x = "Year/month", y = "Prescription rate per 10,000 P-M",
+       color = "CEV") +
+  ylim(0, 2000) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+Stratifying the average monthly number of anti-depressant prescriptions by gender, and COVID period found that both groups had a higher number of anti-depressants during the pandemic period.
+
+
+``` {r, echo = FALSE}
+analysis %>%
+  mutate(covid.period = factor(covid.period, levels = c(0, 1),
+                               labels = c("Pre", "During"))) %>%
+  filter(gender.y != "Not specified",  gender.y != "Unknown") %>%
+  group_by(timestamp, covid.period, gender.y) %>%
+  summarise(n = sum(antidep)) %>%
+  group_by(covid.period, gender.y) %>%
+  summarise(c=n(), avg.monthly = mean(n), sd.monthly = sd(n)) %>%
+  mutate(se.monthly = sd.monthly/sqrt(c)) %>%
+  ggplot(aes(x = gender.y, y = avg.monthly, fill = covid.period)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = avg.monthly-(1.96*sd.monthly), ymax = avg.monthly+(1.96*sd.monthly)),
+                position = position_dodge(0.9), width = 0.1) +
+  labs(x = "Gender", y = "Average monthly prescriptions", 
+       fill = "COVID Period")
+```
+
+
+After stratification by age group, the average number of anti-depressants was higher during the COVID period for all age bands.
+
+``` {r, echo = FALSE}
+analysis %>%
+  mutate(covid.period = factor(covid.period, levels = c(0, 1),
+                               labels = c("Pre", "During"))) %>%
+  group_by(timestamp, covid.period, age.group.time) %>%
+  summarise(n = sum(antidep)) %>%
+  group_by(covid.period, age.group.time) %>%
+  summarise(c=n(), avg.monthly = mean(n), sd.monthly = sd(n)) %>%
+  mutate(se.monthly = sd.monthly/sqrt(c)) %>%
+  ggplot(aes(x = age.group.time, y = avg.monthly, fill = covid.period)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = avg.monthly-(1.96*sd.monthly), ymax = avg.monthly+(1.96*sd.monthly)),
+                position = position_dodge(0.9), width = 0.1) +
+  labs(x = "Age group", y = "Average monthly prescriptions",
+       fill = "COVID period")
+```
+
+
+Stratification by IMD 2019 quintile showed that the most deprived areas had an increase in monthly average anti-depressant prescriptions during the COVID-19 pandemic, similarly to all other deprivation quintiles.
+
+``` {r, echo = FALSE, message = FALSE}
+analysis %>%
+  mutate(covid.period = factor(covid.period, levels = c(0, 1),
+                               labels = c("Pre", "During"))) %>%
+  group_by(timestamp, covid.period, local_imd_quintile.y) %>%
+  summarise(n = sum(antidep)) %>%
+  group_by(covid.period, local_imd_quintile.y) %>%
+  summarise(c=n(), avg.monthly = mean(n), sd.monthly = sd(n)) %>%
+  mutate(se.monthly = sd.monthly/sqrt(c)) %>%
+  mutate(local_imd_quintile.y = factor(local_imd_quintile.y, 
+                                       levels = c("1", "2", "3", "4", "5", "NULL"),
+                                       labels = c("Most deprived", "2", "3", "4", 
+                                                  "Least deprived", "missing"))) %>%
+  
+  ggplot(aes(x = local_imd_quintile.y, y = avg.monthly, fill = covid.period)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = avg.monthly-(1.96*sd.monthly), ymax = avg.monthly+(1.96*sd.monthly)),
+                position = position_dodge(0.9), width = 0.1) +
+  labs(x = "IMD 2019 quintile", y = "Average monthly prescriptions",
+       fill = "COVID period")
+```
+
+
