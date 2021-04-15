@@ -12,11 +12,9 @@ output:
 
 
 ## Methods
-Using data from Liverpool CCG we modelled the monthly rate of anti-depressant prescriptions in the Liverpool population from January 2018 to February 2021, covering the pre and post-COVID pandemic time periods.
+Using data from Liverpool CCG we modeled the monthly rate of anti-depressant prescriptions in the Liverpool population from January 2018 to February 2021, covering the pre and post-COVID pandemic time periods.
 The monthly prescription rate was calculated overall by identifying how many patients had received one or more prescriptions of anti-depressants per month, and dividing by the total number of patients who were alive and contributing data in the same month. To get the rate in person-months, the crude rate was multiplied by 10,000.  
 The crude rate was then stratified by; age in the time period(categorised into 10-year increments); gender; ethnicity; local IMD 2019 quintile; and shielded status.  
-In order to investigate the associations between patient demographics and prescription rate of anti-depressants, logistic regression was fitted to the data.  
-
 
 
 ## Results  
