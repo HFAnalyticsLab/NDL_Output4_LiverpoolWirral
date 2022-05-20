@@ -2,7 +2,7 @@
 
 # Networked Data Lab: NDL Liverpool and Wirral's satellite project on Clinically Extremely Vulnerable (CEV) people
 
-#### Project Status: In progess
+#### Project Status: Completed
 
 ## Project Description
 
